@@ -1,0 +1,28 @@
+---
+- name: Deploy news app
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: "Get news"
+      get_news:
+        number_of_news: 5
+      register: news_results
+
+    # Create a single HTML file with news_results.news_html concatenated
+    - name: "Create news HTML file"
+      copy:
+        dest: "./www/index.html"
+        content: "{{ news_results.news_html | join('\n') }}"
+
+    # Create the Nginx container using podman
+    # Note: if you have SELinux enable, you need to
+    #       make sure you have permission to access the volume
+    - name: Run Nginx container
+      containers.podman.podman_container:
+        name: nginx-hacker-news
+        image: docker.io/nginx:alpine
+        state: started
+        ports:
+          - 8888:80
+        volumes:
+          - ./www:/usr/share/nginx/html:ro
