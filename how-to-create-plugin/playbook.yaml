@@ -1,0 +1,16 @@
+- name: Playbook that invokes a custom Ansible filter plugin
+  hosts: localhost
+  connection: local
+
+  vars:
+    favorite_game: "The Legend of Zelda: The Minish Cap"
+
+  tasks:
+
+    - name: Convert output to JSON
+      ansible.builtin.set_fact:
+        game_upper_case: "{{ favorite_game | grande }}"
+
+    - name: Debug game list
+      ansible.builtin.debug:
+        var: game_upper_case
