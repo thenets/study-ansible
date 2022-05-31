@@ -1,0 +1,18 @@
+- name: Playbook that invokes a Python script
+  hosts: localhost
+  connection: local
+
+  tasks:
+    - name: Run a Python script
+      ansible.builtin.script:
+        executable: python3
+        cmd: game-list.py
+      register: game_list_raw_output
+
+    - name: Convert output to JSON
+      ansible.builtin.set_fact:
+        game_list: "{{ game_list_raw_output.stdout | grande | from_json }}"
+
+    - name: Debug game list
+      ansible.builtin.debug:
+        var: game_list
